@@ -1,0 +1,20 @@
+{% extends "index.html" %}
+{% block weather %}
+<!-- <h2 style="text-align:center">{{city}}</h2> -->
+<br>
+<div class="row d-flex justify-content-center" >
+    <table style="border-collapse: collapse; width: 40%" align="center" class="table table-striped table-hover">
+        <tr class="table-dark">
+            <th style="border-right: 1px solid white;">{{city}}</th>
+            <th style="border-left: 1px solid white;">Weather</th>
+        </tr>
+        {% for row in weather %}
+            <tr class="table table-striped table-hover">
+            <td style="border: 1px solid black;" >{{row}}</td>
+            <td style="border: 1px solid black;">{{weather[row]}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{% endblock %}
