@@ -2,19 +2,87 @@
 {% block weather %}
 <!-- <h2 style="text-align:center">{{city}}</h2> -->
 <br>
-<div class="row d-flex justify-content-center" >
+<div class="row d-flex justify-content-center">
     <table style="border-collapse: collapse; width: 40%" align="center" class="table table-striped table-hover">
         <tr class="table-dark">
             <th style="border-right: 1px solid white;">{{city}}</th>
-            <th style="border-left: 1px solid white;">Weather</th>
+            <th style="border-left: 1px solid white;">Current Weather</th>
         </tr>
-        {% for row in weather %}
-            <tr class="table table-striped table-hover">
-            <td style="border: 1px solid black;" >{{row}}</td>
-            <td style="border: 1px solid black;">{{weather[row]}}</td>
-            </tr>
+        {% for row in current_weather %}
+        <tr class="table table-striped table-hover">
+            <td style="border: 1px solid black;">{{row}}</td>
+            <td style="border: 1px solid black;">{{current_weather[row]}}</td>
+        </tr>
         {% endfor %}
     </table>
 </div>
+
+<br>
+
+<div style="text-align:center;">
+    <h3 style="color:midnightblue;"> Weather Forecast </h3>
+    {% for date in future_weather["Date"].unique() %}
+    <button
+        onclick="myFunction1(this.value)"
+        style="background:darkcyan;color:white;"  
+        value="{{date}}" type="button" class="btn btn-primary"
+        id="{{date}}"
+    >{{date}}</button>
+    {% endfor %}
+</div>
+
+<script>
+    function myFunction(date) {
+      console.log(date);
+      var x = document.getElementById("forecastDiv");
+      if (x.style.display === "none") {
+        x.style.display = "block";
+      } else {
+        x.style.display = "none";
+      }
+    }
+</script>
+  
+<br>
+
+<!-- <div class="row d-flex justify-content-center" >     -->
+<div id="forecastDiv">
+    <table style="border-collapse: collapse; width: 40%" align="center" class="table table-striped table-hover">
+        <tr class="table-dark">
+            {% for col in future_weather.columns %}
+            <th style="border-right: 1px solid white; border-left: 1px solid white;">{{col}}</th>
+            {% endfor %}
+        </tr>
+        {% for row in range(future_weather.shape[0]) %}
+        <tr class="table table-striped table-hover">
+            {% for col in future_weather.columns %}
+            <td style="border: 1px solid black;">{{future_weather.iloc[row][col]}}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<script>
+    function myFunction1(date) {
+        console.log(date);
+        var td;
+        var table = document.getElementById("forecastDiv");
+        var tr = table.getElementsByTagName("tr");
+        var filter = date.toUpperCase();
+        
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[0];
+            if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+            }
+        }
+    }
+</script>
 
 {% endblock %}
