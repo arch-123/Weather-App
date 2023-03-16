@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 import requests, json
-from config import urls
+from config import urls, air_quality
 from datetime import datetime
 import pandas as pd
 
@@ -98,20 +98,47 @@ def get_future_weather(lat, lon):
     return data
 
 
+def clean_aqi_api_response(x):
+    aqi_index = x['list'][0]['main']['aqi']
+    return air_quality[aqi_index]
+
+
+def get_aqi(lat, lon):
+    url = urls["aqi"]["base_url"].format(str(lat), str(lon), urls["api_key"])
+    response = requests.get(url)
+    if response.status_code == 200:
+        x = response.json()
+        # print(x)
+    data = clean_aqi_api_response(x)
+    return data
+
+
 @app.route("/handlesubmit", methods=['POST'])
 def handleSubmit():
     city_name = request.form['city']
     try:
         lat, lon = get_lat_lon(city_name)
     except:
-        return render_template("index.html", error = True, city=city_name)
-    current_weather = get_current_weather(lat, lon)
-    future_weather = get_future_weather(lat, lon)
+        return render_template(
+            "index.html", error = True, 
+            error_mssg="City '{}' does not exists!".format(city_name)
+        )
+    try:
+        current_weather = get_current_weather(lat, lon)
+        future_weather = get_future_weather(lat, lon)
+        aqi = get_aqi(lat, lon)
+    except:
+        return render_template(
+            "index.html", error = True, 
+            error_mssg="Cannot fetch weather data for '{}'!".format(city_name)
+        )
+    
     return render_template(
         "weather.html", 
         city=city_name, 
         current_weather=current_weather, 
         future_weather = future_weather,
+        aqi = aqi,
         error = False
     )
 
